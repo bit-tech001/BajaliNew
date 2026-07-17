@@ -22,7 +22,6 @@ export default function Header({ currentPage, setCurrentPage, contactPhone, cont
     { label: 'Blog', id: 'blog' },
     { label: 'FAQs', id: 'faqs' },
     { label: 'Contact', id: 'contact' },
-    { label: 'Admin', id: 'admin' },
   ];
 
   const handleNavClick = (pageId: string) => {

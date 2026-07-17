@@ -232,9 +232,6 @@ export default function Footer({ settings, setCurrentPage, onNewsletterSubscribe
           </p>
           <div className="flex gap-6 text-gray-400">
             <span>RERA No: PR/GJ/AHMEDABAD/BODAKDEV/AA00412/170726</span>
-            <button onClick={() => handleNavClick('admin')} className="hover:text-[#F97316] font-medium transition-colors">
-              Staff Portal Access
-            </button>
           </div>
         </div>
       </div>

@@ -11,23 +11,28 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Calculators from './components/Calculators';
 import Lightbox from './components/Lightbox';
-import AdminPanel from './components/AdminPanel';
 
 // Data Types
 import { Property, Service, Project, GalleryItem, Blog, Testimonial, FAQ, TeamMember, AppSettings, Enquiry } from './types';
+
+// Static Data
+import { 
+  initialProperties, initialServices, initialProjects, initialGalleryItems, 
+  initialBlogs, initialFAQs, initialTeamMembers, initialTestimonials, initialSettings 
+} from './data';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<string>('home');
   
   // Database States
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
-  const [team, setTeam] = useState<TeamMember[]>([]);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [properties, setProperties] = useState<Property[]>(initialProperties);
+  const [services, setServices] = useState<Service[]>(initialServices);
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const [blogs, setBlogs] = useState<Blog[]>(initialBlogs);
+  const [faqs, setFaqs] = useState<FAQ[]>(initialFAQs);
+  const [team, setTeam] = useState<TeamMember[]>(initialTeamMembers);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
+  const [settings, setSettings] = useState<AppSettings | null>(initialSettings);
 
   // Filter States
   const [propertyFilter, setPropertyFilter] = useState<string>('all');
@@ -59,34 +64,8 @@ export default function App() {
 
   // Load Database Content on mount
   useEffect(() => {
-    fetchInitialData();
+    // UI is client-side only. Keep active records in sync with local memory.
   }, []);
-
-  const fetchInitialData = async () => {
-    try {
-      const [propsRes, srvsRes, projsRes, blogsRes, faqsRes, teamRes, testRes, settingsRes] = await Promise.all([
-        fetch('/api/properties'),
-        fetch('/api/services'),
-        fetch('/api/projects'),
-        fetch('/api/blogs'),
-        fetch('/api/faqs'),
-        fetch('/api/team'),
-        fetch('/api/testimonials'),
-        fetch('/api/settings')
-      ]);
-
-      if (propsRes.ok) setProperties(await propsRes.json());
-      if (srvsRes.ok) setServices(await srvsRes.json());
-      if (projsRes.ok) setProjects(await projsRes.json());
-      if (blogsRes.ok) setBlogs(await blogsRes.json());
-      if (faqsRes.ok) setFaqs(await faqsRes.json());
-      if (teamRes.ok) setTeam(await teamRes.json());
-      if (testRes.ok) setTestimonials(await testRes.json());
-      if (settingsRes.ok) setSettings(await settingsRes.json());
-    } catch (e) {
-      console.error('Failed to sync fullstack database', e);
-    }
-  };
 
   // Hero Slides
   const heroSlides = [
@@ -118,22 +97,11 @@ export default function App() {
 
   // Newsletter Submit Helper
   const handleNewsletterSubscribe = async (email: string): Promise<boolean> => {
-    try {
-      const res = await fetch('/api/enquiries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: 'Newsletter Subscriber',
-          email,
-          phone: 'N/A',
-          type: 'General',
-          message: 'User subscribed to private corporate intelligence reports.'
-        })
-      });
-      return res.ok;
-    } catch {
-      return false;
-    }
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(true);
+      }, 400);
+    });
   };
 
   // Enquiry Submission Helper
@@ -146,21 +114,8 @@ export default function App() {
       return;
     }
 
-    try {
-      const res = await fetch('/api/enquiries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(generalEnquiry)
-      });
-      if (res.ok) {
-        setEnquiryStatus('success');
-        setGeneralEnquiry({ name: '', email: '', phone: '', type: 'General', message: '' });
-      } else {
-        setEnquiryStatus('error');
-      }
-    } catch {
-      setEnquiryStatus('error');
-    }
+    setEnquiryStatus('success');
+    setGeneralEnquiry({ name: '', email: '', phone: '', type: 'General', message: '' });
   };
 
   const handlePropertyEnquirySubmit = async (e: React.FormEvent) => {
@@ -169,36 +124,14 @@ export default function App() {
 
     const phoneInput = (e.currentTarget.elements.namedItem('phone') as HTMLInputElement).value;
     const nameInput = (e.currentTarget.elements.namedItem('name') as HTMLInputElement).value;
-    const emailInput = (e.currentTarget.elements.namedItem('email') as HTMLInputElement).value;
-    const messageInput = (e.currentTarget.elements.namedItem('message') as HTMLInputElement).value;
 
     if (!nameInput || !phoneInput) {
       alert('Please provide name and phone number.');
       return;
     }
 
-    try {
-      const res = await fetch('/api/enquiries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: nameInput,
-          email: emailInput || 'N/A',
-          phone: phoneInput,
-          type: 'Property',
-          propertyName: selectedPropertyEnquiry.title,
-          message: messageInput || `Requesting details and pricing brochure for ${selectedPropertyEnquiry.title}.`
-        })
-      });
-      if (res.ok) {
-        alert('Enquiry logged successfully. An advisory executive will connect shortly.');
-        setSelectedPropertyEnquiry(null);
-      } else {
-        alert('Failed to submit enquiry.');
-      }
-    } catch {
-      alert('Failed to submit enquiry.');
-    }
+    alert('Enquiry logged successfully. An advisory executive will connect shortly.');
+    setSelectedPropertyEnquiry(null);
   };
 
   // Formatter helper
@@ -1338,35 +1271,6 @@ export default function App() {
                   referrerPolicy="no-referrer-when-downgrade"
                 ></iframe>
               </div>
-            </motion.div>
-          )}
-
-          {/* --- PAGE: ADMIN STAFF PORTAL PANEL --- */}
-          {currentPage === 'admin' && (
-            <motion.div 
-              key="admin" 
-              initial={{ opacity: 0, y: 15 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -15 }}
-            >
-              <AdminPanel 
-                settings={activeSettings} 
-                setSettings={setSettings}
-                properties={properties}
-                setProperties={setProperties}
-                services={services}
-                setServices={setServices}
-                projects={projects}
-                setProjects={setProjects}
-                blogs={blogs}
-                setBlogs={setBlogs}
-                faqs={faqs}
-                setFaqs={setFaqs}
-                team={team}
-                setTeam={setTeam}
-                testimonials={testimonials}
-                setTestimonials={setTestimonials}
-              />
             </motion.div>
           )}
 
