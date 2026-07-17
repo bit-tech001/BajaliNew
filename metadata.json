@@ -1,0 +1,8 @@
+{
+  "name": "Balaji Consultancy Services",
+  "description": "Premium Real Estate & Investment Advisory corporate website based in Ahmedabad, Gujarat.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
